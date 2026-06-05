@@ -4,6 +4,21 @@
 
 Track tester engagement during your **Google Play closed-testing** program. The SDK automatically collects session data, screen views, and custom events from your Android app and sends them to the TestPulse dashboard where you can monitor tester activity, engagement scores, and generate reports.
 
+## Why TestPulse?
+
+Google Play no longer approves production releases based on tester count alone. They now evaluate **tester engagement** — how actively testers use your app, how often they open it, which screens they visit, and whether they stick around for the full testing period.
+
+Meeting the 12–14 tester minimum isn't enough. If testers install your app but never open it, or open it once and abandon it, Google may reject your production release.
+
+TestPulse helps you **prove readiness** by showing:
+- **Active testers** vs total installs — how many actually use the app
+- **Session frequency** — are testers opening the app daily?
+- **Screen depth** — are they exploring beyond the first screen?
+- **Engagement trends** — is interest growing or dropping over the 14-day window?
+- **At-risk testers** — who hasn't opened the app in 2+ days so you can nudge them
+
+Use TestPulse to catch issues early, re-engage inactive testers, and ship to production with confidence.
+
 ## How It Works — End to End
 
 ```
