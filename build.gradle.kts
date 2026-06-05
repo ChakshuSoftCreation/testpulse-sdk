@@ -63,7 +63,7 @@ afterEvaluate {
         publications {
             create<MavenPublication>("release") {
                 from(components["release"])
-                groupId = "com.github.ChakshuSoft"
+                groupId = "com.github.Chakshu1221"
                 artifactId = "testpulse-sdk"
                 version = "1.0.5"
             }

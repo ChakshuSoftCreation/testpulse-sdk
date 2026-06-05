@@ -1,6 +1,6 @@
 # TestPulse Android SDK
 
-[![](https://jitpack.io/v/ChakshuSoftCreation/testpulse-sdk.svg)](https://jitpack.io/#ChakshuSoftCreation/testpulse-sdk)
+[![](https://jitpack.io/v/Chakshu1221/testpulse-sdk.svg)](https://jitpack.io/#Chakshu1221/testpulse-sdk)
 
 Track tester engagement during Google Play closed testing — session frequency, screen flows, daily activity, and device info.
 
@@ -42,7 +42,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.ChakshuSoftCreation:testpulse-sdk:1.0.6")
+    implementation("com.github.Chakshu1221:testpulse-sdk:1.0.6")
 }
 ```
 
@@ -53,7 +53,7 @@ dependencies {
 
 ```kotlin
 dependencies {
-    implementation("com.github.ChakshuSoftCreation:testpulse-sdk:1.0.6")
+    implementation("com.github.Chakshu1221:testpulse-sdk:1.0.6")
 }
 ```
 
