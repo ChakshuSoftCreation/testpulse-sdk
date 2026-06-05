@@ -14,6 +14,9 @@ import io.testpulse.sdk.internal.EventTracker
 import io.testpulse.sdk.internal.ScreenTracker
 import io.testpulse.sdk.internal.SessionTracker
 import io.testpulse.sdk.internal.TesterRegistration
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 object TestPulse {
 
@@ -35,6 +38,7 @@ object TestPulse {
     private lateinit var dataBatcher: DataBatcher
     private lateinit var apiClient: ApiClient
     private lateinit var deviceCollector: DeviceCollector
+    private val ioScope = CoroutineScope(Dispatchers.IO)
 
     internal fun initialize(context: Context) {
         if (isInitialized) return
@@ -73,7 +77,9 @@ object TestPulse {
         if (TesterRegistration.isRegistered(applicationContext)) {
             val alias = TesterRegistration.getTesterAlias(applicationContext) ?: ""
             val deviceUuid = TesterRegistration.getDeviceUuid(applicationContext)
-            apiClient.registerTester(deviceUuid, alias, deviceCollector.deviceInfo)
+            ioScope.launch {
+                apiClient.registerTester(deviceUuid, alias, deviceCollector.deviceInfo)
+            }
         }
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(sessionTracker)
@@ -84,9 +90,11 @@ object TestPulse {
                     if (!TesterRegistration.isRegistered(applicationContext)) {
                         TesterRegistration.showRegistrationDialog(activity) { alias ->
                             val deviceUuid = TesterRegistration.getDeviceUuid(applicationContext)
-                            apiClient.registerTester(
-                                deviceUuid, alias, deviceCollector.deviceInfo
-                            )
+                            ioScope.launch {
+                                apiClient.registerTester(
+                                    deviceUuid, alias, deviceCollector.deviceInfo
+                                )
+                            }
                         }
                     }
                 }
@@ -132,6 +140,8 @@ object TestPulse {
         if (!isInitialized) return
         TesterRegistration.updateAlias(applicationContext, alias)
         val deviceUuid = TesterRegistration.getDeviceUuid(applicationContext)
-        apiClient.registerTester(deviceUuid, alias, deviceCollector.deviceInfo)
+        ioScope.launch {
+            apiClient.registerTester(deviceUuid, alias, deviceCollector.deviceInfo)
+        }
     }
 }

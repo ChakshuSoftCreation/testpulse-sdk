@@ -1,12 +1,11 @@
 package io.testpulse.sdk.internal
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
+import android.widget.EditText
 import android.widget.Toast
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import io.testpulse.sdk.R
-import io.testpulse.sdk.TestPulse
 import java.util.UUID
 
 class TesterRegistration {
@@ -40,37 +39,34 @@ class TesterRegistration {
         }
 
         fun showRegistrationDialog(activity: Activity, onComplete: (alias: String) -> Unit) {
-            val dialog = BottomSheetDialog(activity)
-            val view = activity.layoutInflater.inflate(
-                R.layout.dialog_tester_registration, null
-            )
-            dialog.setContentView(view)
-            dialog.setCancelable(false)
-
-            val etAlias = view.findViewById<com.google.android.material.textfield.TextInputEditText>(
-                R.id.etAlias
-            )
-            val btnStart = view.findViewById<com.google.android.material.button.MaterialButton>(
-                R.id.btnStartTesting
-            )
-
-            btnStart.setOnClickListener {
-                val alias = etAlias.text?.toString()?.trim() ?: ""
-                if (alias.isBlank()) {
-                    Toast.makeText(activity, "Please enter your name", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-
-                val prefs = prefs(activity)
-                prefs.edit()
-                    .putString(KEY_TESTER_ALIAS, alias)
-                    .putString(KEY_DEVICE_UUID, getDeviceUuid(activity))
-                    .putBoolean(KEY_IS_REGISTERED, true)
-                    .apply()
-
-                onComplete(alias)
-                dialog.dismiss()
+            val input = EditText(activity).apply {
+                hint = "Your name or alias"
+                maxLines = 1
             }
+
+            val dialog = AlertDialog.Builder(activity)
+                .setTitle("Welcome, Tester!")
+                .setMessage("Enter your name so the developer can track your feedback.")
+                .setView(input)
+                .setCancelable(false)
+                .setPositiveButton("Start Testing") { _, _ ->
+                    val alias = input.text.toString().trim()
+                    if (alias.isBlank()) {
+                        Toast.makeText(activity, "Please enter your name", Toast.LENGTH_SHORT).show()
+                        showRegistrationDialog(activity, onComplete)
+                        return@setPositiveButton
+                    }
+
+                    val prefs = prefs(activity)
+                    prefs.edit()
+                        .putString(KEY_TESTER_ALIAS, alias)
+                        .putString(KEY_DEVICE_UUID, getDeviceUuid(activity))
+                        .putBoolean(KEY_IS_REGISTERED, true)
+                        .apply()
+
+                    onComplete(alias)
+                }
+                .create()
 
             dialog.show()
         }
