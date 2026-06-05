@@ -18,7 +18,7 @@ import io.testpulse.sdk.internal.TesterRegistration
 object TestPulse {
 
     private const val TAG = "TestPulse"
-    private const val DEFAULT_BASE_URL = "https://testpulse-api.onrender.com"
+    private const val DEFAULT_BASE_URL = "https://testpulse-api-lfwq.onrender.com"
 
     @Volatile
     var isInitialized: Boolean = false
