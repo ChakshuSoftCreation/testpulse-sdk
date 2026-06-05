@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application>
+        <provider
+            android:name="io.testpulse.sdk.TestPulseInitProvider"
+            android:authorities="${applicationId}.testpulse-init"
+            android:exported="false"
+            android:initOrder="100" />
+    </application>
+
+</manifest>
