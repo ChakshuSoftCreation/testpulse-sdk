@@ -2,23 +2,40 @@
 
 [![](https://jitpack.io/v/ChakshuSoftCreation/testpulse-sdk.svg)](https://jitpack.io/#ChakshuSoftCreation/testpulse-sdk)
 
-TestPulse SDK tracks tester engagement during Google Play closed-testing programs. It automatically collects session data, screen views, and custom events from your Android app and sends them to the TestPulse backend for analysis.
+Track tester engagement during your **Google Play closed-testing** program. The SDK automatically collects session data, screen views, and custom events from your Android app and sends them to the TestPulse dashboard where you can monitor tester activity, engagement scores, and generate reports.
 
-## Features
+## How It Works — End to End
 
-- **Automatic initialization** via `ContentProvider` — no `Application` class changes needed
-- **Session tracking** — start/stop sessions with lifecycle-aware auto-detection
-- **Screen tracking** — log screen transitions with timestamps
-- **Custom events** — track any in-app event with optional metadata
-- **Offline queue** — stores unsynced events in Room DB, flushes every 60 seconds
-- **Device profiling** — collects device model, OS version, locale, screen resolution
-- **Tester registration** — automatically registers the device with the TestPulse backend
+```
+1. Sign up on TestPulse dashboard  →  Create a project  →  Get API Key
+2. Add this SDK to your app        →  Set API Key in AndroidManifest.xml
+3. Users install your app          →  SDK auto-registers them as testers
+4. Users test your app             →  SDK tracks sessions, screens, events
+5. Data syncs to backend           →  View engagement on dashboard
+```
 
-## Integration
+## Prerequisites
 
-### 1. Add the dependency
+- Android **minSdk 24** (Android 7.0) or higher
+- A **TestPulse project** and **API key** (see step 1 below)
 
-**`settings.gradle.kts`**
+## Step 1: Get Your API Key from the Dashboard
+
+1. Go to the **TestPulse dashboard** — [https://testpulse-dashboard-x3yd.onrender.com](https://testpulse-dashboard-x3yd.onrender.com)
+2. **Sign up** for an account (or log in)
+3. Click **"New Project"**, enter your app name and package name
+4. The project is created and an **API key** is displayed — copy it
+   ```
+   tp_proj_6dd52f542dfcd1114e759bcfe97a266fcbbc6600240c8e13
+   ```
+5. You can always find your API key later under **Settings** → **API Keys** for any project
+
+## Step 2: Add the SDK to Your App
+
+### settings.gradle.kts
+
+Add the JitPack repository:
+
 ```kotlin
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -30,137 +47,311 @@ dependencyResolutionManagement {
 }
 ```
 
-**`app/build.gradle.kts`**
+### app/build.gradle.kts
+
+Add the dependency:
+
 ```kotlin
 dependencies {
     debugImplementation("com.github.ChakshuSoftCreation:testpulse-sdk:1.0.0")
 }
 ```
 
-> Use `debugImplementation` if you only want tracking in debug builds, or `implementation` for release builds too.
+> Use `debugImplementation` to track only in debug builds, or `implementation` to track in release builds too.
 
-### 2. Configure in AndroidManifest.xml
+### Sync your project
+
+Click **"Sync Now"** in Android Studio or run `./gradlew app:dependencies` from terminal.
+
+## Step 3: Configure AndroidManifest.xml
+
+Add two `<meta-data>` entries inside the `<application>` tag:
 
 ```xml
-<application ...>
+<application
+    android:name=".MyApplication"
+    android:icon="@mipmap/ic_launcher"
+    ...>
+
+    <!-- REQUIRED: Your API key from the dashboard -->
     <meta-data
         android:name="io.testpulse.API_KEY"
-        android:value="tp_proj_YOUR_PROJECT_API_KEY" />
+        android:value="tp_proj_6dd52f542dfcd1114e759bcfe97a266fcbbc6600240c8e13" />
 
-    <!-- Optional: defaults to https://testpulse-api-lfwq.onrender.com -->
+    <!-- OPTIONAL: Custom backend URL (defaults to https://testpulse-api-lfwq.onrender.com) -->
     <meta-data
         android:name="io.testpulse.BASE_URL"
-        android:value="https://your-custom-backend.com" />
+        android:value="https://testpulse-api-lfwq.onrender.com" />
+
+    <!-- Your existing activities -->
+    <activity android:name=".MainActivity">
+        ...
+    </activity>
 </application>
 ```
 
-### 3. Initialize
+## Step 4: Initialize (Zero Code Required)
 
-The SDK auto-initializes via `TestPulseInitProvider` — no code required.
+The SDK **auto-initializes** using a `ContentProvider` — there is no need to modify your `Application` class or call any init method.
 
-To initialize explicitly (e.g. from `Application.onCreate()` or `MainActivity.onCreate()`):
+If you prefer to initialize manually, call from your `Application.onCreate()` or `MainActivity.onCreate()`:
 
 ```kotlin
 TestPulse.init(this)
 ```
 
-To display the tester registration dialog (alias input):
+That's it. The SDK will:
+- Collect device info (model, OS, screen resolution, locale)
+- Register the device as a tester with the backend
+- Start tracking sessions automatically using lifecycle callbacks
+- Queue events locally in Room DB and flush every 60 seconds
+
+## Step 5: Track Custom Data (Optional)
+
+### Record Screen Views
+
+Call this in each Activity's `onResume()`:
 
 ```kotlin
-TestPulse.showRegistrationDialog(activity) { alias ->
-    // Tester registered with alias
+override fun onResume() {
+    super.onResume()
+    TestPulse.recordScreenView("HomeScreen")
 }
 ```
 
+```kotlin
+override fun onResume() {
+    super.onResume()
+    TestPulse.recordScreenView("CheckoutScreen")
+}
+```
+
+### Record Custom Events
+
+Track any in-app action with optional JSON data:
+
+```kotlin
+// Simple event
+TestPulse.recordEvent("purchase_completed")
+
+// Event with data
+TestPulse.recordEvent(
+    "level_up",
+    mapOf("level" to 5, "score" to 1200, "character" to "warrior")
+)
+```
+
+### Show Tester Registration Dialog
+
+Prompt the tester to enter their name/alias:
+
+```kotlin
+TestPulse.showRegistrationDialog(activity) { alias ->
+    // Optional: do something when tester registers
+    Log.d("TestPulse", "Tester registered as: $alias")
+}
+```
+
+The dialog looks like this:
+
+```
+┌──────────────────────────────┐
+│     TestPulse Tester ID      │
+│                              │
+│  Enter your name or alias:   │
+│  ┌──────────────────────┐   │
+│  │                      │   │
+│  └──────────────────────┘   │
+│                              │
+│        [  Submit  ]          │
+└──────────────────────────────┘
+```
+
+It only shows once per device — subsequent calls are ignored.
+
+## Full Example — Minimal Integration
+
+**`app/build.gradle.kts`** (relevant parts):
+```kotlin
+dependencies {
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.lifecycle:lifecycle-process:2.8.3")
+    debugImplementation("com.github.ChakshuSoftCreation:testpulse-sdk:1.0.0")
+}
+```
+
+**`AndroidManifest.xml`**:
+```xml
+<application ...>
+    <meta-data android:name="io.testpulse.API_KEY" android:value="tp_proj_..." />
+</application>
+```
+
+**`MainActivity.kt`**:
+```kotlin
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        TestPulse.showRegistrationDialog(this) {
+            Toast.makeText(this, "Welcome, $it!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        TestPulse.recordScreenView("MainScreen")
+    }
+
+    fun onButtonClick() {
+        TestPulse.recordEvent("button_clicked", mapOf("button" to "get_started"))
+    }
+}
+```
+
+## What Data Does the SDK Collect?
+
+The SDK automatically collects device information to identify and profile testers:
+
+| Data Point | Example |
+|------------|---------|
+| **Device model** | Pixel 7 |
+| **Manufacturer** | Google |
+| **OS version** | Android 14 |
+| **SDK level** | 34 |
+| **App version** | 1.0.0 (1) |
+| **Screen resolution** | 1080x2400 |
+| **Locale** | en_US |
+| **Network type** | wifi |
+| **Device UUID** | auto-generated unique ID |
+
+Each session records:
+- **Start and end time** (with duration)
+- **Screens viewed** (name, enter/exit time, duration)
+- **Custom events** (name, timestamp, optional JSON payload)
+
+> No personally identifiable information is collected unless you explicitly pass it via custom events.
+
 ## API Reference
 
-### TestPulse (singleton)
+### TestPulse (public singleton)
 
 | Method | Description |
 |--------|-------------|
-| `init(context)` | Initialize SDK (auto-called by ContentProvider) |
-| `isInitialized` | Check if SDK is initialized |
-| `recordScreenView(screenName)` | Log a screen transition |
-| `recordEvent(name, data?)` | Log a custom event with optional JSON data |
-| `startSession()` | Manually start a session |
-| `endSession()` | Manually end the current session |
+| `init(context)` | Initialize the SDK. Auto-called by ContentProvider — usually not needed. |
+| `isInitialized` | Boolean — check if SDK is ready |
+| `recordScreenView(screenName)` | Log a screen view with the given name |
+| `recordEvent(name, data?)` | Log a custom event with optional `Map<String, Any?>` data |
+| `startSession()` | Force-start a new session (auto-managed by lifecycle) |
+| `endSession()` | Force-end current session |
 | `getDeviceUuid(): String` | Get the unique device identifier |
-| `showRegistrationDialog(activity, callback)` | Show alias input dialog |
-| `flush()` | Force-flush pending events to backend |
+| `showRegistrationDialog(activity, callback)` | Show alias input dialog (shows once per device) |
+| `flush()` | Immediately send all queued events to the backend |
 | `setBaseUrl(url)` | Override the backend URL at runtime |
 
-### Lifecycle
+### DeviceInfo (data class)
 
-The SDK uses `ProcessLifecycleOwner` to automatically start a session when the app comes to the foreground and end it when it goes to the background. No manual session management is needed for most use cases.
+```kotlin
+data class DeviceInfo(
+    val deviceModel: String,
+    val manufacturer: String,
+    val osVersion: String,
+    val sdkInt: Int,
+    val appVersion: String,
+    val appVersionCode: Int,
+    val screenResolution: String?,
+    val locale: String?,
+    val networkType: String?
+)
+```
 
-## Data Collected
+## How Data Flows
 
-### Device Info
-| Field | Example |
-|-------|---------|
-| deviceModel | Pixel 7 |
-| osVersion | Android 14 |
-| appVersion | 1.0.0 |
-| screenResolution | 1080x2400 |
-| locale | en_US |
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                         Your Android App                          │
+│                                                                   │
+│  ┌──────────────┐   ┌──────────────┐   ┌──────────────────────┐  │
+│  │ ScreenTracker │   │ EventTracker │   │   SessionTracker     │  │
+│  │ recordScreen  │   │ recordEvent  │   │ lifecycle-aware      │  │
+│  └──────┬───────┘   └──────┬───────┘   └──────────┬───────────┘  │
+│         │                  │                       │              │
+│         └──────────────────┼───────────────────────┘              │
+│                            ▼                                      │
+│                   ┌───────────────┐                               │
+│                   │   DataBatcher  │  Buffers events locally       │
+│                   │  (Room DB)     │  Flushes every 60 seconds    │
+│                   └───────┬───────┘                               │
+│                           │                                        │
+│                           ▼                                        │
+│                   ┌───────────────┐                               │
+│                   │   ApiClient    │  POST /api/v1/ingest/         │
+│                   │  (OkHttp)     │  with X-API-Key header        │
+│                   └───────┬───────┘                               │
+└───────────────────────────┼──────────────────────────────────────┘
+                            │
+                            ▼
+              ┌─────────────────────────┐
+              │   TestPulse Backend      │
+              │   https://testpulse-api  │
+              │   -lfwq.onrender.com     │
+              └────────────┬────────────┘
+                           │
+                           ▼
+              ┌─────────────────────────┐
+              │  Supabase Database       │
+              │  + Dashboard             │
+              │  (engagement scores,     │
+              │   reports, alerts)       │
+              └─────────────────────────┘
+```
 
-### Session Data
-| Field | Description |
-|-------|-------------|
-| sessionUuid | Unique session identifier |
-| startTime | Session start timestamp |
-| endTime | Session end timestamp |
-| durationSec | Session duration in seconds |
-| screens[] | Array of screen events viewed |
-| events[] | Array of custom events recorded |
+## Troubleshooting
 
-### Screen Event
-| Field | Description |
-|-------|-------------|
-| screenName | Screen/activity name |
-| enteredAt | Time entered |
-| exitedAt | Time exited |
-| durationSec | Time spent on screen |
+### "API key not found"
+- Make sure you added `io.testpulse.API_KEY` to your `AndroidManifest.xml`
+- Verify the key value matches the one shown in the dashboard Settings page
 
-## Build
+### "Tester not registered"
+- The SDK registers the tester on first launch
+- Check that your device has internet access
+- Verify the `BASE_URL` is correct (default: `https://testpulse-api-lfwq.onrender.com`)
+
+### "No data on dashboard"
+- Data flushes every 60 seconds — wait up to 2 minutes
+- Or call `TestPulse.flush()` to force-send
+- Verify the API key in your manifest matches the project
+
+### "Duplicate tester entries"
+- The SDK deduplicates by `device_uuid` per project — each device registers once
+
+## Build from Source
 
 ```bash
+git clone https://github.com/ChakshuSoftCreation/testpulse-sdk.git
+cd testpulse-sdk
 ./gradlew :testpulse-sdk:build
 ```
 
-## Test
+## Run Tests
 
 ```bash
 ./gradlew :testpulse-sdk:test
 ```
 
-Tests cover: API client, data batcher, session tracking, screen tracking, and full engagement flow (25 tests).
+25 tests covering: API client, data batching, session tracking, screen tracking, and the full engagement flow.
 
-## Architecture
+## Publishing to JitPack
 
-```
-App ──▶ TestPulse.init()
-            │
-            ├──▶ DeviceCollector   →  device info (model, OS, etc.)
-            ├──▶ SessionTracker    →  lifecycle-aware sessions
-            ├──▶ ScreenTracker     →  Activity screen transitions
-            ├──▶ EventTracker      →  custom in-app events
-            ├──▶ TesterRegistration → register device with backend
-            │
-            ├──▶ DataBatcher       →  queue + flush (every 60s)
-            ├──▶ ApiClient         →  HTTP calls to backend
-            │
-            └──▶ Room DB           →  offline storage
-                        (EventDao / EventEntity)
+Every GitHub tag triggers a JitPack build:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
 ```
 
-## Publishing
-
-The SDK is published to **JitPack**. Every GitHub tag triggers a new build:
-
-1. Tag a release: `git tag v1.0.0 && git push origin v1.0.0`
-2. JitPack builds the AAR automatically
-3. Users reference `com.github.ChakshuSoftCreation:testpulse-sdk:VERSION`
+JitPack automatically builds the AAR and makes it available at `com.github.ChakshuSoftCreation:testpulse-sdk:VERSION`.
 
 ## License
 
