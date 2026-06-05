@@ -104,7 +104,9 @@ class DataBatcher(context: Context, private val apiClient: ApiClient) {
 
         val deviceUuid = TesterRegistration.getDeviceUuid(appContext)
 
-        val sessionEvents = mutableListOf<SessionEvent>()
+        val sessionMap = mutableMapOf<String, SessionEvent>()
+        val screenMap = mutableMapOf<String, MutableList<ScreenEvent>>()
+        val eventMap = mutableMapOf<String, MutableList<CustomEventData>>()
         val processedIds = mutableListOf<Long>()
 
         for (entity in unsynced) {
@@ -113,14 +115,39 @@ class DataBatcher(context: Context, private val apiClient: ApiClient) {
                     val session = moshi.adapter(SessionEvent::class.java)
                         .fromJson(entity.jsonPayload)
                     if (session != null) {
-                        sessionEvents.add(session)
+                        sessionMap[session.sessionUuid] = session
+                        processedIds.add(entity.id)
+                    }
+                }
+                "screen" -> {
+                    val screen = moshi.adapter(ScreenEvent::class.java)
+                        .fromJson(entity.jsonPayload)
+                    if (screen != null) {
+                        val uuid = entity.sessionUuid ?: return
+                        screenMap.getOrPut(uuid) { mutableListOf() }.add(screen)
+                        processedIds.add(entity.id)
+                    }
+                }
+                "custom" -> {
+                    val event = moshi.adapter(CustomEventData::class.java)
+                        .fromJson(entity.jsonPayload)
+                    if (event != null) {
+                        val uuid = entity.sessionUuid ?: return
+                        eventMap.getOrPut(uuid) { mutableListOf() }.add(event)
                         processedIds.add(entity.id)
                     }
                 }
             }
         }
 
-        if (sessionEvents.isEmpty()) return
+        if (sessionMap.isEmpty()) return
+
+        val sessionEvents = sessionMap.map { (uuid, session) ->
+            session.copy(
+                screens = screenMap[uuid] ?: emptyList(),
+                events = eventMap[uuid] ?: emptyList()
+            )
+        }
 
         val payload = TelemetryPayload(
             deviceUuid = deviceUuid,
