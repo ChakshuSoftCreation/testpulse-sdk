@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="32dp">
+
+    <LinearLayout
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:gravity="center"
+        android:background="@drawable/bg_logo"
+        android:duplicateParentState="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TP"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TestPulse"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#1F2937"
+        android:layout_marginTop="12dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tester Engagement SDK"
+        android:textSize="13sp"
+        android:textColor="#6C5CE7"
+        android:layout_marginTop="2dp"
+        android:letterSpacing="0.08" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="This app uses TestPulse to track your engagement during Google Play closed testing. Your data helps the developer improve the app before production release."
+        android:textSize="14sp"
+        android:textColor="#6B7280"
+        android:gravity="center"
+        android:layout_marginTop="24dp"
+        android:lineSpacingExtra="4dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enter your name to begin:"
+        android:textSize="14sp"
+        android:textColor="#374151"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/etAlias"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Your name or alias"
+        android:inputType="textPersonName"
+        android:maxLength="50"
+        android:padding="14dp"
+        android:textSize="15sp"
+        android:background="@android:drawable/editbox_background" />
+
+    <Button
+        android:id="@+id/btnStartTesting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Testing"
+        android:textSize="15sp"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="20dp" />
+
+</LinearLayout>
