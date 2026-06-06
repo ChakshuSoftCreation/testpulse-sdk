@@ -6,6 +6,7 @@ import android.os.Looper
 import io.testpulse.sdk.db.EventDao
 import io.testpulse.sdk.db.EventEntity
 import io.testpulse.sdk.db.TestPulseDatabase
+import io.testpulse.sdk.model.CrashData
 import io.testpulse.sdk.model.CustomEventData
 import io.testpulse.sdk.model.ScreenEvent
 import io.testpulse.sdk.model.SessionEvent
@@ -125,6 +126,7 @@ class DataBatcher(context: Context, private val apiClient: ApiClient) {
         val sessionMap = mutableMapOf<String, SessionEvent>()
         val screenMap = mutableMapOf<String, MutableList<ScreenEvent>>()
         val eventMap = mutableMapOf<String, MutableList<CustomEventData>>()
+        val crashList = mutableListOf<CrashData>()
         val processedIds = mutableListOf<Long>()
 
         for (entity in unsynced) {
@@ -156,12 +158,25 @@ class DataBatcher(context: Context, private val apiClient: ApiClient) {
                     }
                 }
                 "crash" -> {
-                    processedIds.add(entity.id)
+                    try {
+                        val json = org.json.JSONObject(entity.jsonPayload)
+                        crashList.add(
+                            CrashData(
+                                sessionUuid = entity.sessionUuid,
+                                exceptionType = json.optString("exceptionType", ""),
+                                message = json.optString("message", ""),
+                                stackTrace = json.optString("stackTrace", ""),
+                                timestamp = json.optString("timestamp", "")
+                            )
+                        )
+                        processedIds.add(entity.id)
+                    } catch (_: Exception) {
+                    }
                 }
             }
         }
 
-        if (sessionMap.isEmpty()) return
+        if (sessionMap.isEmpty() && crashList.isEmpty()) return
 
         val sessionEvents = sessionMap.map { (uuid, session) ->
             session.copy(
@@ -172,7 +187,8 @@ class DataBatcher(context: Context, private val apiClient: ApiClient) {
 
         val payload = TelemetryPayload(
             deviceUuid = deviceUuid,
-            sessions = sessionEvents
+            sessions = sessionEvents,
+            crashes = crashList
         )
 
         val success = apiClient.ingest(payload)

@@ -132,7 +132,9 @@ object TestPulse {
                 override fun onActivityPaused(a: Activity) {}
                 override fun onActivityStopped(a: Activity) {}
                 override fun onActivitySaveInstanceState(a: Activity, b: Bundle) {}
-                override fun onActivityDestroyed(a: Activity) {}
+                override fun onActivityDestroyed(a: Activity) {
+                    TesterRegistration.onActivityDestroyed()
+                }
             }
         )
 

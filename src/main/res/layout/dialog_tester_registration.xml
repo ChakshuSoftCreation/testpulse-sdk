@@ -1,83 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:padding="32dp">
+    android:background="@android:color/transparent">
 
     <LinearLayout
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:gravity="center"
-        android:background="@drawable/bg_logo"
-        android:duplicateParentState="true">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@android:color/white">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- Hero Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:background="@drawable/bg_dialog_hero"
+            android:paddingHorizontal="24dp">
+
+            <LinearLayout
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:gravity="center"
+                android:background="@drawable/bg_logo">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TP"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TestPulse"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tester Engagement SDK"
+                android:textSize="11sp"
+                android:textColor="#C4B5FD"
+                android:letterSpacing="0.06" />
+        </LinearLayout>
+
+        <!-- Content Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TP"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF" />
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="20dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Welcome to the Test!"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#1F2937" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="You've been invited to join this app's closed testing program. Your feedback and engagement help the developer deliver a polished experience for everyone."
+                android:textSize="13sp"
+                android:textColor="#6B7280"
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="4dp" />
+
+            <!-- Features -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="16dp"
+                android:background="#F5F3FF"
+                android:padding="14dp"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="✦  Complete daily tasks  ✦"
+                    android:textSize="13sp"
+                    android:textColor="#6D28D9"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Report crashes  •  Track progress"
+                    android:textSize="12sp"
+                    android:textColor="#7C3AED"
+                    android:layout_marginTop="4dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Help ship a better app!"
+                    android:textSize="12sp"
+                    android:textColor="#7C3AED"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="What should we call you?"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#374151"
+                android:layout_marginTop="18dp"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/etAlias"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter your name or alias"
+                android:inputType="textPersonName"
+                android:maxLength="50"
+                android:padding="14dp"
+                android:textSize="14sp"
+                android:textColor="#1F2937"
+                android:textColorHint="#9CA3AF"
+                android:background="@drawable/bg_input" />
+
+            <Button
+                android:id="@+id/btnStartTesting"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="Start Testing"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="18dp"
+                android:background="@drawable/bg_btn_primary"
+                android:stateListAnimator="@null" />
+
+            <TextView
+                android:id="@+id/btnAbout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="About TestPulse \u2192"
+                android:textSize="13sp"
+                android:textColor="#7C3AED"
+                android:textStyle="bold"
+                android:layout_marginTop="14dp"
+                android:layout_gravity="center_horizontal"
+                android:paddingVertical="6dp"
+                android:paddingHorizontal="8dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TestPulse"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:textColor="#1F2937"
-        android:layout_marginTop="12dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Tester Engagement SDK"
-        android:textSize="13sp"
-        android:textColor="#6C5CE7"
-        android:layout_marginTop="2dp"
-        android:letterSpacing="0.08" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="This app uses TestPulse to track your engagement during Google Play closed testing. Your data helps the developer improve the app before production release."
-        android:textSize="14sp"
-        android:textColor="#6B7280"
-        android:gravity="center"
-        android:layout_marginTop="24dp"
-        android:lineSpacingExtra="4dp" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Enter your name to begin:"
-        android:textSize="14sp"
-        android:textColor="#374151"
-        android:textStyle="bold"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="8dp" />
-
-    <EditText
-        android:id="@+id/etAlias"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Your name or alias"
-        android:inputType="textPersonName"
-        android:maxLength="50"
-        android:padding="14dp"
-        android:textSize="15sp"
-        android:background="@android:drawable/editbox_background" />
-
-    <Button
-        android:id="@+id/btnStartTesting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Start Testing"
-        android:textSize="15sp"
-        android:textColor="#FFFFFF"
-        android:layout_marginTop="20dp" />
-
-</LinearLayout>
+</ScrollView>

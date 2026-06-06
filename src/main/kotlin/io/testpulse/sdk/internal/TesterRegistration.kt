@@ -3,12 +3,13 @@ package io.testpulse.sdk.internal
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
+import android.net.Uri
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import io.testpulse.sdk.R
 import java.util.UUID
@@ -20,6 +21,10 @@ class TesterRegistration {
         private const val KEY_DEVICE_UUID = "tp_device_uuid"
         private const val KEY_TESTER_ALIAS = "tp_tester_alias"
         private const val KEY_IS_REGISTERED = "tp_is_registered"
+
+        @Volatile
+        private var isDialogShowing = false
+        private var currentDialog: Dialog? = null
 
         private fun prefs(context: Context): SharedPreferences {
             return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -44,18 +49,39 @@ class TesterRegistration {
         }
 
         fun showRegistrationDialog(activity: Activity, onComplete: (alias: String) -> Unit) {
+            if (isDialogShowing || activity.isFinishing) return
+            isDialogShowing = true
+
             val view = activity.layoutInflater.inflate(
                 R.layout.dialog_tester_registration, null
             )
 
             val etAlias = view.findViewById<EditText>(R.id.etAlias)
             val btnStart = view.findViewById<Button>(R.id.btnStartTesting)
+            val btnAbout = view.findViewById<TextView>(R.id.btnAbout)
 
-            val btnBg = GradientDrawable().apply {
-                setColor(Color.parseColor("#6C5CE7"))
-                cornerRadii = floatArrayOf(12f, 12f, 12f, 12f, 12f, 12f, 12f, 12f)
+            btnAbout.setOnClickListener {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://testpulse-dashboard-x3yd.onrender.com/"))
+                activity.startActivity(intent)
             }
-            btnStart.background = btnBg
+
+            val dialog = Dialog(activity)
+            currentDialog = dialog
+            dialog.setContentView(view)
+            dialog.setCancelable(false)
+            dialog.setCanceledOnTouchOutside(false)
+            val window = dialog.window
+            if (window != null) {
+                window.setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                window.setBackgroundDrawableResource(android.R.color.transparent)
+            }
+            dialog.setOnDismissListener {
+                isDialogShowing = false
+                currentDialog = null
+            }
 
             btnStart.setOnClickListener {
                 val alias = etAlias.text.toString().trim()
@@ -71,25 +97,24 @@ class TesterRegistration {
                     .putBoolean(KEY_IS_REGISTERED, true)
                     .apply()
 
+                dialog.dismiss()
                 onComplete(alias)
             }
 
-            val dialog = Dialog(activity)
-            dialog.setContentView(view)
-            dialog.setCancelable(false)
-            dialog.setCanceledOnTouchOutside(false)
-            val window = dialog.window
-            if (window != null) {
-                window.setLayout(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            }
             dialog.show()
         }
 
         fun updateAlias(context: Context, newAlias: String) {
             prefs(context).edit().putString(KEY_TESTER_ALIAS, newAlias).apply()
+        }
+
+        fun onActivityDestroyed() {
+            isDialogShowing = false
+            try {
+                currentDialog?.dismiss()
+            } catch (_: Exception) {
+            }
+            currentDialog = null
         }
     }
 }

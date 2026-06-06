@@ -1,10 +1,10 @@
 # TestPulse Android SDK
 
-[![](https://jitpack.io/v/Chakshu1221/testpulse-sdk.svg)](https://jitpack.io/#Chakshu1221/testpulse-sdk)
+[![](https://jitpack.io/v/ChakshuSoftCreation/testpulse-sdk.svg)](https://jitpack.io/#ChakshuSoftCreation/testpulse-sdk)
 
 Track tester engagement during Google Play closed testing — session frequency, screen flows, daily activity, and device info.
 
-> **v1.0.6**: Daily task broadcasting + auto-crash capture. Polls server for day-specific tasks on session start, captures unhandled exceptions via `Thread.setDefaultUncaughtExceptionHandler`.
+> **v1.0.2**: Crash fix — registration dialog no longer requires Material Components theme. Network calls moved off main thread.
 
 ## Requirements
 
@@ -42,7 +42,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.Chakshu1221:testpulse-sdk:1.0.6")
+    implementation("com.github.ChakshuSoftCreation:testpulse-sdk:1.0.1")
 }
 ```
 
@@ -53,7 +53,7 @@ dependencies {
 
 ```kotlin
 dependencies {
-    implementation("com.github.Chakshu1221:testpulse-sdk:1.0.6")
+    implementation("com.github.ChakshuSoftCreation:testpulse-sdk:1.0.1")
 }
 ```
 
