@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
+import android.provider.Settings
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
@@ -19,6 +20,7 @@ class TesterRegistration {
     companion object {
         private const val PREFS_NAME = "testpulse_prefs"
         private const val KEY_DEVICE_UUID = "tp_device_uuid"
+        private const val KEY_DEVICE_FINGERPRINT = "tp_device_fingerprint"
         private const val KEY_TESTER_ALIAS = "tp_tester_alias"
         private const val KEY_IS_REGISTERED = "tp_is_registered"
 
@@ -34,14 +36,41 @@ class TesterRegistration {
             return prefs(context).getBoolean(KEY_IS_REGISTERED, false)
         }
 
+        /**
+         * Returns a persistent device identifier using Settings.Secure.ANDROID_ID.
+         * ANDROID_ID survives app data clears on the same device (same signing key).
+         * Falls back to a random UUID if ANDROID_ID is unavailable.
+         * Once generated, the value is cached in SharedPreferences for speed.
+         */
         fun getDeviceUuid(context: Context): String {
             val prefs = prefs(context)
             var uuid = prefs.getString(KEY_DEVICE_UUID, null)
             if (uuid == null) {
-                uuid = UUID.randomUUID().toString()
+                uuid = resolveFingerprint(context)
                 prefs.edit().putString(KEY_DEVICE_UUID, uuid).apply()
             }
             return uuid
+        }
+
+        private fun resolveFingerprint(context: Context): String {
+            val prefs = prefs(context)
+            var fp = prefs.getString(KEY_DEVICE_FINGERPRINT, null)
+            if (fp == null) {
+                fp = try {
+                    val aid = Settings.Secure.getString(
+                        context.contentResolver, Settings.Secure.ANDROID_ID
+                    )
+                    if (!aid.isNullOrBlank() && aid != "9774d56d682e549c") {
+                        "tp_$aid"
+                    } else {
+                        "tp_${UUID.randomUUID()}"
+                    }
+                } catch (_: Exception) {
+                    "tp_${UUID.randomUUID()}"
+                }
+                prefs.edit().putString(KEY_DEVICE_FINGERPRINT, fp).apply()
+            }
+            return fp
         }
 
         fun getTesterAlias(context: Context): String? {
