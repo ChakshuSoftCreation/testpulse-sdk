@@ -1,10 +1,8 @@
 # TestPulse Android SDK
 
-[![](https://jitpack.io/v/ChakshuSoftCreation/testpulse-sdk.svg)](https://jitpack.io/#ChakshuSoftCreation/testpulse-sdk)
+[![](https://jitpack.io/v/Chakshu1221/testpulse-sdk.svg)](https://jitpack.io/#Chakshu1221/testpulse-sdk)
 
 Track tester engagement during Google Play closed testing — session frequency, screen flows, daily activity, and device info.
-
-> **v1.0.2**: Crash fix — registration dialog no longer requires Material Components theme. Network calls moved off main thread.
 
 ## Requirements
 
@@ -42,7 +40,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.ChakshuSoftCreation:testpulse-sdk:1.0.1")
+    implementation("com.github.Chakshu1221:testpulse-sdk:1.0.+")
 }
 ```
 
@@ -53,24 +51,17 @@ dependencies {
 
 ```kotlin
 dependencies {
-    implementation("com.github.ChakshuSoftCreation:testpulse-sdk:1.0.1")
+    implementation("com.github.Chakshu1221:testpulse-sdk:1.0.+")
 }
 ```
 
-### Step 3: Add meta-data to AndroidManifest.xml
+### Step 3: Add API key to AndroidManifest.xml
 
 ```xml
 <application>
-    <!-- Your existing components -->
-
     <meta-data
         android:name="io.testpulse.API_KEY"
         android:value="YOUR_API_KEY" />
-
-    <!-- Optional: custom base URL (defaults to TestPulse cloud) -->
-    <meta-data
-        android:name="io.testpulse.BASE_URL"
-        android:value="https://your-custom-server.com" />
 </application>
 ```
 
