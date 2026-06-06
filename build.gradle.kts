@@ -65,7 +65,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.Chakshu1221"
                 artifactId = "testpulse-sdk"
-                version = "1.0.11"
+                version = "1.0.12"
             }
         }
     }

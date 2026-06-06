@@ -80,8 +80,9 @@ object TestPulse {
         if (TesterRegistration.isRegistered(applicationContext)) {
             val alias = TesterRegistration.getTesterAlias(applicationContext) ?: ""
             val deviceUuid = TesterRegistration.getDeviceUuid(applicationContext)
+            val deviceFingerprint = TesterRegistration.getDeviceFingerprint(applicationContext)
             ioScope.launch {
-                apiClient.registerTester(deviceUuid, alias, deviceCollector.deviceInfo)
+                apiClient.registerTester(deviceUuid, deviceFingerprint, alias, deviceCollector.deviceInfo)
             }
         }
 
@@ -117,9 +118,10 @@ object TestPulse {
                     if (!TesterRegistration.isRegistered(applicationContext)) {
                         TesterRegistration.showRegistrationDialog(activity) { alias ->
                             val deviceUuid = TesterRegistration.getDeviceUuid(applicationContext)
+                            val deviceFingerprint = TesterRegistration.getDeviceFingerprint(applicationContext)
                             ioScope.launch {
                                 apiClient.registerTester(
-                                    deviceUuid, alias, deviceCollector.deviceInfo
+                                    deviceUuid, deviceFingerprint, alias, deviceCollector.deviceInfo
                                 )
                             }
                         }
@@ -171,8 +173,9 @@ object TestPulse {
         if (!isInitialized) return
         TesterRegistration.updateAlias(applicationContext, alias)
         val deviceUuid = TesterRegistration.getDeviceUuid(applicationContext)
+        val deviceFingerprint = TesterRegistration.getDeviceFingerprint(applicationContext)
         ioScope.launch {
-            apiClient.registerTester(deviceUuid, alias, deviceCollector.deviceInfo)
+            apiClient.registerTester(deviceUuid, deviceFingerprint, alias, deviceCollector.deviceInfo)
         }
     }
 }

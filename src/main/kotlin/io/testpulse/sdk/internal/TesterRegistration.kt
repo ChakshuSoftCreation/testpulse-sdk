@@ -42,6 +42,10 @@ class TesterRegistration {
          * Falls back to a random UUID if ANDROID_ID is unavailable.
          * Once generated, the value is cached in SharedPreferences for speed.
          */
+        fun getDeviceFingerprint(context: Context): String {
+            return resolveFingerprint(context)
+        }
+
         fun getDeviceUuid(context: Context): String {
             val prefs = prefs(context)
             var uuid = prefs.getString(KEY_DEVICE_UUID, null)

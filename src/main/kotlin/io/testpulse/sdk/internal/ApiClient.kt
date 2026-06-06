@@ -27,12 +27,14 @@ class ApiClient(private val apiKey: String, private val baseUrl: String) {
 
     fun registerTester(
         deviceUuid: String,
+        deviceFingerprint: String,
         alias: String,
         deviceInfo: DeviceInfo
     ): Boolean {
         return try {
             val json = moshi.adapter(Map::class.java).toJson(mapOf(
                 "deviceUuid" to deviceUuid,
+                "deviceFingerprint" to deviceFingerprint,
                 "alias" to alias,
                 "deviceModel" to deviceInfo.deviceModel,
                 "osVersion" to deviceInfo.osVersion,
