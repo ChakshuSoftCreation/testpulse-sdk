@@ -43,7 +43,7 @@ class ApiClientTest {
             networkType = "wifi"
         )
 
-        val result = apiClient.registerTester("device-uuid-1", "Rahul", deviceInfo)
+        val result = apiClient.registerTester("device-uuid-1", "tp_android_id", "Rahul", deviceInfo)
 
         val request = mockWebServer.takeRequest()
         assert(request.method == "POST")
@@ -63,7 +63,7 @@ class ApiClientTest {
             screenResolution = "1080x2400", locale = "en_US", networkType = "wifi"
         )
 
-        val result = apiClient.registerTester("uuid", "Rahul", deviceInfo)
+        val result = apiClient.registerTester("uuid", "tp_android_id", "Rahul", deviceInfo)
         assert(result)
     }
 
@@ -76,7 +76,7 @@ class ApiClientTest {
             sdkInt = 34, appVersion = "1.0.0", appVersionCode = 1,
             screenResolution = "1080x2400", locale = "en_US", networkType = "wifi"
         )
-        val result = apiClient.registerTester("uuid", "Rahul", deviceInfo)
+        val result = apiClient.registerTester("uuid", "tp_android_id", "Rahul", deviceInfo)
         assert(!result)
     }
 

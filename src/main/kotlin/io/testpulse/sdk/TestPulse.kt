@@ -53,6 +53,10 @@ object TestPulse {
                 PackageManager.GET_META_DATA
             )
             val meta = ai.metaData
+            if (meta == null) {
+                Log.w(TAG, "No meta-data found in AndroidManifest")
+                return
+            }
 
             apiKey = meta.getString("io.testpulse.API_KEY") ?: ""
             if (apiKey.isEmpty()) {
@@ -97,13 +101,13 @@ object TestPulse {
                 val stackTrace = sw.toString()
                 val sessionUuid = sessionTracker.currentSessionUuid
 
-                dataBatcher.queueCrash(
+                dataBatcher.queueCrashSync(
                     throwable.javaClass.name,
                     throwable.message ?: "",
                     stackTrace,
                     sessionUuid
                 )
-                dataBatcher.flushNow()
+                dataBatcher.flushNowSync()
             } catch (_: Exception) {
             } finally {
                 defaultHandler?.uncaughtException(thread, throwable)

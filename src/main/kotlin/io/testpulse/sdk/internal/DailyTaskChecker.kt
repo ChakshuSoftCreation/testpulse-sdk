@@ -11,8 +11,11 @@ import android.widget.Button
 import android.widget.TextView
 import io.testpulse.sdk.R
 import org.json.JSONObject
+import java.util.concurrent.Executors
 
 class DailyTaskChecker(private val context: Context, private val apiClient: ApiClient) {
+
+    private val ioExecutor = Executors.newCachedThreadPool()
 
     companion object {
         private const val PREFS_NAME = "testpulse_prefs"
@@ -91,9 +94,9 @@ class DailyTaskChecker(private val context: Context, private val apiClient: ApiC
 
         btnMarkDone.setOnClickListener {
             prefs(context).edit().putInt(KEY_LAST_TASK_SEEN, dayNumber).apply()
-            Thread {
+            ioExecutor.execute {
                 apiClient.markDailyTaskSeen(deviceUuid, dayNumber)
-            }.start()
+            }
             dialog.dismiss()
         }
 

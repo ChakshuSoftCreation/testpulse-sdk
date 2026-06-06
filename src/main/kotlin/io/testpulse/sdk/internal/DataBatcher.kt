@@ -16,6 +16,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class DataBatcher(context: Context, private val apiClient: ApiClient) {
 
@@ -64,20 +65,30 @@ class DataBatcher(context: Context, private val apiClient: ApiClient) {
 
     fun queueCrash(exceptionType: String, message: String, stackTrace: String, sessionUuid: String?) {
         scope.launch {
-            val json = org.json.JSONObject().apply {
-                put("exceptionType", exceptionType)
-                put("message", message)
-                put("stackTrace", stackTrace)
-                put("timestamp", java.time.Instant.now().toString())
-            }.toString()
-            eventDao.insert(
-                EventEntity(
-                    type = "crash",
-                    sessionUuid = sessionUuid,
-                    jsonPayload = json
-                )
-            )
+            doQueueCrash(exceptionType, message, stackTrace, sessionUuid)
         }
+    }
+
+    fun queueCrashSync(exceptionType: String, message: String, stackTrace: String, sessionUuid: String?) {
+        runBlocking {
+            doQueueCrash(exceptionType, message, stackTrace, sessionUuid)
+        }
+    }
+
+    private suspend fun doQueueCrash(exceptionType: String, message: String, stackTrace: String, sessionUuid: String?) {
+        val json = org.json.JSONObject().apply {
+            put("exceptionType", exceptionType)
+            put("message", message)
+            put("stackTrace", stackTrace)
+            put("timestamp", java.time.Instant.now().toString())
+        }.toString()
+        eventDao.insert(
+            EventEntity(
+                type = "crash",
+                sessionUuid = sessionUuid,
+                jsonPayload = json
+            )
+        )
     }
 
     fun queueCustomEvent(event: CustomEventData, sessionUuid: String?) {
@@ -106,6 +117,10 @@ class DataBatcher(context: Context, private val apiClient: ApiClient) {
 
     fun flushNow() {
         scope.launch { performFlushSync() }
+    }
+
+    fun flushNowSync() {
+        runBlocking { performFlushSync() }
     }
 
     private fun performFlush() {
@@ -143,7 +158,7 @@ class DataBatcher(context: Context, private val apiClient: ApiClient) {
                     val screen = moshi.adapter(ScreenEvent::class.java)
                         .fromJson(entity.jsonPayload)
                     if (screen != null) {
-                        val uuid = entity.sessionUuid ?: return
+                        val uuid = entity.sessionUuid ?: continue
                         screenMap.getOrPut(uuid) { mutableListOf() }.add(screen)
                         processedIds.add(entity.id)
                     }
@@ -152,7 +167,7 @@ class DataBatcher(context: Context, private val apiClient: ApiClient) {
                     val event = moshi.adapter(CustomEventData::class.java)
                         .fromJson(entity.jsonPayload)
                     if (event != null) {
-                        val uuid = entity.sessionUuid ?: return
+                        val uuid = entity.sessionUuid ?: continue
                         eventMap.getOrPut(uuid) { mutableListOf() }.add(event)
                         processedIds.add(entity.id)
                     }
