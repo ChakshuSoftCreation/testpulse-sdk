@@ -126,7 +126,9 @@ object TestPulse {
                             }
                         }
                     } else {
-                        dailyTaskChecker.pollAndShowIfNeeded(activity)
+                        ioScope.launch {
+                            dailyTaskChecker.pollAndShowIfNeeded(activity)
+                        }
                     }
                 }
                 override fun onActivityCreated(a: Activity, b: Bundle?) {}

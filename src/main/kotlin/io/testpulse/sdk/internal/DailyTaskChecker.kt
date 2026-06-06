@@ -27,6 +27,9 @@ class DailyTaskChecker(private val context: Context, private val apiClient: ApiC
         val deviceUuid = TesterRegistration.getDeviceUuid(context)
         val response = apiClient.getDailyTask(deviceUuid) ?: return
 
+        val dayNumber: Int
+        val title: String
+        val description: String
         try {
             val json = JSONObject(response)
             val taskJson = json.optJSONObject("task") ?: return
@@ -34,12 +37,15 @@ class DailyTaskChecker(private val context: Context, private val apiClient: ApiC
 
             if (alreadySeen) return
 
-            val dayNumber = taskJson.optInt("dayNumber", 0)
-            val title = taskJson.optString("title", "")
-            val description = taskJson.optString("description", "")
-
-            showDailyTaskDialog(activity, dayNumber, title, description, deviceUuid)
+            dayNumber = taskJson.optInt("dayNumber", 0)
+            title = taskJson.optString("title", "")
+            description = taskJson.optString("description", "")
         } catch (_: Exception) {
+            return
+        }
+
+        activity.runOnUiThread {
+            showDailyTaskDialog(activity, dayNumber, title, description, deviceUuid)
         }
     }
 
@@ -85,7 +91,9 @@ class DailyTaskChecker(private val context: Context, private val apiClient: ApiC
 
         btnMarkDone.setOnClickListener {
             prefs(context).edit().putInt(KEY_LAST_TASK_SEEN, dayNumber).apply()
-            apiClient.markDailyTaskSeen(deviceUuid, dayNumber)
+            Thread {
+                apiClient.markDailyTaskSeen(deviceUuid, dayNumber)
+            }.start()
             dialog.dismiss()
         }
 
