@@ -2,7 +2,7 @@
 
 [![](https://jitpack.io/v/Chakshu1221/testpulse-sdk.svg)](https://jitpack.io/#Chakshu1221/testpulse-sdk)
 
-Track tester engagement during Google Play closed testing — session frequency, screen flows, daily activity, and device info.
+Track tester engagement during Google Play closed testing — session frequency, screen flows, daily activity, device info, and crash capture.
 
 ## Requirements
 
@@ -12,10 +12,9 @@ Track tester engagement during Google Play closed testing — session frequency,
 
 ## Integration
 
-### Step 1: Add JitPack repository
+### Native Android
 
-<details>
-<summary><b>Native Android project</b> (settings.gradle.kts)</summary>
+**Step 1** — Add JitPack in `settings.gradle.kts`:
 
 ```kotlin
 dependencyResolutionManagement {
@@ -27,27 +26,8 @@ dependencyResolutionManagement {
     }
 }
 ```
-</details>
 
-<details>
-<summary><b>Flutter project</b> (android/app/build.gradle.kts)</summary>
-
-Add **inside** your `android/app/build.gradle.kts`, after `android { }` block:
-
-```kotlin
-repositories {
-    maven { url = uri("https://jitpack.io") }
-}
-
-dependencies {
-    implementation("com.github.Chakshu1221:testpulse-sdk:1.0.+")
-}
-```
-
-> **Why not in settings.gradle.kts?** Flutter plugins declare their own repositories in subproject build files. Adding JitPack to settings-level `dependencyResolutionManagement` causes Gradle to search JitPack for Flutter internal artifacts, which breaks the build.
-</details>
-
-### Step 2: Add the dependency
+**Step 2** — Add the dependency in `app/build.gradle.kts`:
 
 ```kotlin
 dependencies {
@@ -55,7 +35,7 @@ dependencies {
 }
 ```
 
-### Step 3: Add API key to AndroidManifest.xml
+**Step 3** — Add API key to `AndroidManifest.xml`:
 
 ```xml
 <application>
@@ -65,9 +45,56 @@ dependencies {
 </application>
 ```
 
-### Step 4: Internet permission (already in SDK)
+### Flutter
 
-The SDK declares `INTERNET` and `ACCESS_NETWORK_STATE` permissions automatically — no action needed.
+**Step 1** — Add JitPack and the dependency in `android/app/build.gradle.kts` (after the `android { }` block):
+
+```kotlin
+android {
+    // ... your existing config
+}
+
+repositories {
+    maven { url = uri("https://jitpack.io") }
+}
+
+dependencies {
+    implementation("com.github.Chakshu1221:testpulse-sdk:1.0.+")
+}
+```
+
+**Step 2** — Add API key to `android/app/src/main/AndroidManifest.xml`:
+
+```xml
+<application>
+    <meta-data
+        android:name="io.testpulse.API_KEY"
+        android:value="YOUR_API_KEY" />
+</application>
+```
+
+> **Flutter note:** Do NOT add JitPack in `settings.gradle.kts`. Flutter plugin subprojects cannot resolve it there. Always use `android/app/build.gradle.kts`. The meta-data goes in `android/app/src/main/AndroidManifest.xml` — not the root `android/AndroidManifest.xml`.
+
+### Auto-init (zero boilerplate)
+
+The SDK auto-initializes via a `ContentProvider` — no manual init code required. Internet and network state permissions are declared automatically.
+
+If you prefer manual init, add this to your manifest:
+
+```xml
+<meta-data android:name="io.testpulse.AUTO_INIT" android:value="false" />
+```
+
+Then initialize in `Application.onCreate()`:
+
+```kotlin
+class MyApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        TestPulse.initialize(this)
+    }
+}
+```
 
 ---
 
