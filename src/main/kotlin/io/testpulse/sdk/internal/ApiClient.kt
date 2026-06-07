@@ -11,7 +11,11 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
-class ApiClient(private val apiKey: String, private val baseUrl: String) {
+class ApiClient(
+    private val apiKey: String,
+    private val baseUrl: String,
+    private val sdkVersion: String
+) {
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
@@ -46,6 +50,7 @@ class ApiClient(private val apiKey: String, private val baseUrl: String) {
             val request = Request.Builder()
                 .url("$baseUrl/api/v1/ingest/register-tester")
                 .header("X-API-Key", apiKey)
+                .header("X-TestPulse-SDK-Version", sdkVersion)
                 .post(json.toRequestBody(jsonMediaType))
                 .build()
 
@@ -61,6 +66,7 @@ class ApiClient(private val apiKey: String, private val baseUrl: String) {
             val request = Request.Builder()
                 .url("$baseUrl/api/v1/ingest/daily-task?deviceUuid=$deviceUuid")
                 .header("X-API-Key", apiKey)
+                .header("X-TestPulse-SDK-Version", sdkVersion)
                 .get()
                 .build()
 
@@ -81,6 +87,7 @@ class ApiClient(private val apiKey: String, private val baseUrl: String) {
             val request = Request.Builder()
                 .url("$baseUrl/api/v1/ingest/daily-task/seen")
                 .header("X-API-Key", apiKey)
+                .header("X-TestPulse-SDK-Version", sdkVersion)
                 .post(json.toRequestBody(jsonMediaType))
                 .build()
 
@@ -90,13 +97,15 @@ class ApiClient(private val apiKey: String, private val baseUrl: String) {
     }
 
     fun ingest(payload: TelemetryPayload): Boolean {
+        val enriched = payload.copy(sdkVersion = sdkVersion)
         return try {
             val adapter = moshi.adapter(TelemetryPayload::class.java)
-            val json = adapter.toJson(payload)
+            val json = adapter.toJson(enriched)
 
             val request = Request.Builder()
                 .url("$baseUrl/api/v1/ingest/")
                 .header("X-API-Key", apiKey)
+                .header("X-TestPulse-SDK-Version", sdkVersion)
                 .post(json.toRequestBody(jsonMediaType))
                 .build()
 

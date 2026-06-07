@@ -8,5 +8,6 @@ data class CrashData(
     val exceptionType: String,
     val message: String,
     val stackTrace: String,
-    val timestamp: String
+    val timestamp: String,
+    val sdkVersion: String? = null
 )

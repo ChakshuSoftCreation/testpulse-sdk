@@ -18,7 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-class DataBatcher(context: Context, private val apiClient: ApiClient) {
+class DataBatcher(context: Context, private val apiClient: ApiClient, private val sdkVersion: String) {
 
     private val appContext = context.applicationContext
     private val db: TestPulseDatabase = TestPulseDatabase.getInstance(appContext)
@@ -81,6 +81,7 @@ class DataBatcher(context: Context, private val apiClient: ApiClient) {
             put("message", message)
             put("stackTrace", stackTrace)
             put("timestamp", java.time.Instant.now().toString())
+            put("sdkVersion", sdkVersion)
         }.toString()
         eventDao.insert(
             EventEntity(
@@ -181,7 +182,8 @@ class DataBatcher(context: Context, private val apiClient: ApiClient) {
                                 exceptionType = json.optString("exceptionType", ""),
                                 message = json.optString("message", ""),
                                 stackTrace = json.optString("stackTrace", ""),
-                                timestamp = json.optString("timestamp", "")
+                                timestamp = json.optString("timestamp", ""),
+                                sdkVersion = json.optString("sdkVersion", null)
                             )
                         )
                         processedIds.add(entity.id)

@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 object TestPulse {
 
     private const val TAG = "TestPulse"
+    const val SDK_VERSION = "1.0.15"
     private const val DEFAULT_BASE_URL = "https://testpulse-api-lfwq.onrender.com"
 
     @Volatile
@@ -73,9 +74,9 @@ object TestPulse {
             return
         }
 
-        apiClient = ApiClient(apiKey, baseUrl)
+        apiClient = ApiClient(apiKey, baseUrl, SDK_VERSION)
         deviceCollector = DeviceCollector(applicationContext)
-        dataBatcher = DataBatcher(applicationContext, apiClient)
+        dataBatcher = DataBatcher(applicationContext, apiClient, SDK_VERSION)
         eventTracker = EventTracker(dataBatcher)
         screenTracker = ScreenTracker(dataBatcher)
         sessionTracker = SessionTracker(dataBatcher, screenTracker)
